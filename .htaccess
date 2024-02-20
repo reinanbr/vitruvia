@@ -1,0 +1,88 @@
+RewriteEngine On
+RewriteBase /
+
+
+#// permite apenas uma pasta
+# RewriteCond %{REQUEST_URI} ^/sites/static(/|$)
+# RewriteRule ^ - [L]
+
+
+#// bloqueia tudo
+RewriteCond %{REQUEST_URI} !^/index\.php$
+RewriteRule ^ index.php [L]
+
+# # Bloqueia o acesso direto a todos os outros arquivos .php
+RewriteCond %{THE_REQUEST} ^.+\ .+\.php[\ /?].*$
+RewriteRule ^ - [F,L]
+
+
+
+## // bloqueia apenas .php
+
+
+# Redireciona todas as requisições de arquivos PHP para index.php
+RewriteCond %{REQUEST_FILENAME} \.php$
+RewriteRule ^(.*)$ index.php [L]
+
+
+
+#RewriteRule ^index\\.php$ - [L]
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteRule ^(.*)$ /index.php [QSA,L]
+#RewriteRule  .  /index.php [L,NC] 
+
+
+<Files ~ "^.*">
+   Deny from all
+ 
+</Files>
+
+<Files ~ "|css|js|.*\.png|.*\.jpg|.*\.gif|.*\.jpeg">
+Allow from all
+</Files>
+
+DirectoryIndex  index.php [L]
+# Redirect to a URL on the same host
+Redirect "/app" "/templates/projects/apps.php"
+
+# Deny access to .htaccess
+<Files .htaccess *.json>
+Order allow,deny
+Deny from all
+</Files>
+# Disable directory browsing 
+Options -Indexes
+# Hide the contents of directories
+IndexIgnore *
+
+# Hide files of type .png, .zip, .jpg, .gif and .doc from listing
+IndexIgnore *.png *.zip *.jpg *.gif *.doc *.json templates/
+
+# Deny access to files with extensions .ini, .psd, .log, .sh
+<FilesMatch "\.(ini|psd|log|sh|htaccess|json)$">
+Order allow,deny
+Deny from all
+
+</FilesMatch>
+
+
+# Password protect files
+<FilesMatch "^(execute|index|myfile|anotherfile)*$">
+AuthType Basic
+AuthName "Mypassword"
+AuthUserFile <Full Server Path to .htpasswd file>/.htpasswd
+Require valid-user
+</FilesMatch>
+
+
+
+
+
+# <IfModule mod_headers.c> 
+#  Header always set Access-Control-Allow-Origin "*"
+#  Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+#  Header always set Access-Control-Max-Age "1000"
+#  Header always set Access-Control-Allow-Headers "Origin, Accept, Accept-  Version,  Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-api-key, X-Response-Time, X-PINGOTHER, X-CSRF-Token,Authorization"
+#  Header always set Access-Control-Expose-Headers "*"
+# </IfModule>

@@ -1,0 +1,16 @@
+{
+    "name": "jezuis/vitruvia",
+    "description": "framework api",
+    "autoload": {
+        "psr-4": {
+            "app\\": "./app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "reinanbr",
+            "email": "perseu912@gmail.com"
+        }
+    ],
+    "require": {}
+}

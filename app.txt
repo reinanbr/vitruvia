@@ -1,0 +1,15 @@
+app/
+├── Core
+│   ├── Database
+│   └── Web
+│       ├── Application.php
+│       ├── Error
+│       ├── Request.php
+│       └── Router.php
+├── Middleware
+└── Utils
+    ├── Json
+    │   └── Jsonify.php
+    └── Sys
+
+9 directories, 4 files
