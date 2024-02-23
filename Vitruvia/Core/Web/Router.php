@@ -1,14 +1,15 @@
 <?php
 
-namespace app\Core\Web;
+namespace Vitruvia\Core\Web;
 
 
 class Router{
     
     public Request $request;
     protected array $routes = [];
+    protected string $dirViews = "/";
 
-    public function __construct(\app\Core\Web\Request $request){
+    public function __construct(\Vitruvia\Core\Web\Request $request){
         $this->request = $request;
     }
 
@@ -21,7 +22,7 @@ class Router{
      * specified path is accessed using the HTTP GET method.
      */
     public function get($path,$call){
-        $this->routes['get'][$path] = $call;
+        $this->routes['GET'][$path] = $call;
     }
 
     /**
@@ -38,10 +39,7 @@ class Router{
         $this->routes['post'][$path] = $call;
     }
 
-    /**
-     * The function resolves the requested path and method to call the corresponding route handler or
-     * display a 404 error message.
-     */
+
     public function resolve(){
         $path = $this->request->getPath();
         $method = $this->request->getMethod();
@@ -50,6 +48,17 @@ class Router{
             echo 'error 404';
             exit;
         }
-        echo call_user_func($call);
+        if (is_string($call)){
+            return $this->renderView($call);
+        }
+        return call_user_func($call);
+    }
+
+    public function set_dir_views($dirViews){
+        $this->dirViews = $dirViews;
+    }
+    public function renderView($view){
+        $dir_views = $this->dirViews;
+        include_once "$dir_views/$view.php";
     }
 }

@@ -3,7 +3,7 @@
     "description": "framework api",
     "autoload": {
         "psr-4": {
-            "app\\": "./app/"
+            "Vitruvia\\": "./Vitruvia/"
         }
     },
     "authors": [

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Utils\Json;
+namespace Vitruvia\Utils\Json;
 
 class Jsonify
 {

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\Core\Web;
+namespace Vitruvia\Core\Web;
 
 
 /* The `class Application` is defining a class called `Application` within the `config\core` namespace.
@@ -18,8 +18,13 @@ class Application
         $this->router = new Router($this->request);
     }
 
-    public function run(){
-        $this->router->resolve();
+    public function dir_views(string $dirViews){
+        $this->router->set_dir_views($dirViews);
     }
+
+    public function run(){
+        echo $this->router->resolve();
+    }
+
 }
 
