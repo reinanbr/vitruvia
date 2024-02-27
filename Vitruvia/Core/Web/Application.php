@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Vitruvia\Core\Web;
 
 
@@ -13,7 +12,7 @@ class Application
     public Request $request;
     public function __construct()
     {
-        
+
         $this->request = new Request();
         $this->router = new Router($this->request);
     }
@@ -25,6 +24,5 @@ class Application
     public function run(){
         echo $this->router->resolve();
     }
-
 }
 

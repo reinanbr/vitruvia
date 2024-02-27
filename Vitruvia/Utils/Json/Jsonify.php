@@ -5,8 +5,15 @@ namespace Vitruvia\Utils\Json;
 class Jsonify
 {
     protected array $listHeaders = ['Content-Type: application/json'];
+ 
     /**
-     * The function sets the headers for an application/json response with CORS support.
+     * The function `headers` in PHP adds a header to a list and returns null.
+     * 
+     * @param string $header The `headers` function takes a string parameter named ``. This
+     * parameter represents a header value that will be added to the `listHeaders` array within the
+     * function.
+     * 
+     * @return null The function `headers` is returning `null`.
      */
     public function headers(string $header):null
     {
@@ -15,6 +22,10 @@ class Jsonify
     }
 
 
+    /**
+     * The `runHeader` function iterates through a list of headers and sets them using the `header`
+     * function in PHP.
+     */
     protected function runHeader(){
         foreach($this->listHeaders as $header){
     /*         header('Access-Control-Allow-Origin: *');

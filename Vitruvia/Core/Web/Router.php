@@ -36,7 +36,7 @@ class Router{
      * generating the appropriate response.
      */
     public function post($path,$call){
-        $this->routes['post'][$path] = $call;
+        $this->routes['POST'][$path] = $call;
     }
 
 
@@ -44,6 +44,7 @@ class Router{
         $path = $this->request->getPath();
         $method = $this->request->getMethod();
         $call = $this->routes[$method][$path] ?? false;
+
         if ($call == false){
             echo 'error 404';
             exit;
@@ -51,7 +52,9 @@ class Router{
         if (is_string($call)){
             return $this->renderView($call);
         }
-        return call_user_func($call);
+
+        $requestMethod = $this->request->getDataRequest();
+        return call_user_func($call,$requestMethod);
     }
 
     public function set_dir_views($dirViews){

@@ -8,13 +8,15 @@ use Vitruvia\Utils\Json\Jsonify;
 $app = new Application();
 
 
-$app->router->get('/api',function(){
+$app->router->post('/api',function($request){
     $jsonify = new Jsonify();
     $jsonify->headers('Access-Control-Allow-Origin: *');
 
+
     return $jsonify->run([
         "status"=>200,
-        "message"=>"ok"
+        "message"=>"ok",
+        "data"=>$request["input"]
     ]);
 });
 
