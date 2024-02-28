@@ -33,7 +33,7 @@
     </a>
   </nav>
 
-
+{{content}}
 
   <!-- Remove the container if you want to extend the Footer to full width. -->
   <div class=" my-5" style=" margin:0">
