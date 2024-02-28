@@ -1,16 +1,19 @@
 <?php
 
 namespace Vitruvia\Core\Web;
+use Vitruvia\Core\Controllers\SiteController;
 
 
 class Router{
     
     public Request $request;
+    public Response $response;
     protected array $routes = [];
     protected string $dirViews = "/";
 
-    public function __construct(\Vitruvia\Core\Web\Request $request){
+    public function __construct(Request $request, Response $response){
         $this->request = $request;
+        $this->response = $response;
     }
 
     /**
@@ -46,22 +49,42 @@ class Router{
         $call = $this->routes[$method][$path] ?? false;
 
         if ($call == false){
-            echo 'error 404';
-            exit;
+            $this->response->setStatusCode(404);
+            return $this->renderView("_404");
         }
+  /*       if (is_array($call)){
+            return call_user_func($call);
+        } */
         if (is_string($call)){
             return $this->renderView($call);
         }
-
-        $requestMethod = $this->request->getDataRequest();
-        return call_user_func($call,$requestMethod);
+        #$requestMethod = $this->request->getDataRequest();
+        return call_user_func($call);
     }
 
-    public function set_dir_views($dirViews){
-        $this->dirViews = $dirViews;
-    }
+
     public function renderView($view){
-        $dir_views = $this->dirViews;
-        include_once "$dir_views/$view.php";
+
+        $layoutContent = $this->layoutContent();
+        $viewContent = $this->renderOnlyView($view);
+        return str_replace("{{content}}",$viewContent,$layoutContent);
+    }
+
+    public function renderContent($viewContent){
+
+        $layoutContent = $this->layoutContent();
+        return str_replace("{{content}}",$viewContent,$layoutContent);
+    }
+
+    protected function layoutContent(){
+        ob_start();
+        include_once Application::$ROOT_DIR."/views/layouts/base.php";
+        return ob_get_clean();
+    }
+
+    protected function renderOnlyView($view){
+        ob_start();
+        include_once Application::$ROOT_DIR."/views/$view.php";
+        return ob_get_clean();
     }
 }

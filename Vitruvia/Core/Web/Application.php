@@ -9,16 +9,19 @@ initializes the `` property by creating a new instance of the `Router` class. */
 class Application
 {
     public Router $router;
+    public static String $ROOT_DIR;
     public Request $request;
-    public function __construct()
+    public Response $response;
+    public static Application $app;
+
+    public function __construct($rootPath)
     {
-
+        self::$ROOT_DIR = $rootPath;
+        self::$app = $this;
         $this->request = new Request();
-        $this->router = new Router($this->request);
-    }
-
-    public function dir_views(string $dirViews){
-        $this->router->set_dir_views($dirViews);
+        $this->response = new response();
+        $this->router = new Router($this->request,$this->response);
+        
     }
 
     public function run(){
