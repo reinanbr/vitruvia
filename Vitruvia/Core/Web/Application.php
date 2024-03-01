@@ -1,7 +1,7 @@
 <?php
 
 namespace Vitruvia\Core\Web;
-
+use Vitruvia\Utils\System\Path;
 
 /* The `class Application` is defining a class called `Application` within the `config\core` namespace.
 This class has a property called `` of type `Router`. It also has a constructor method that

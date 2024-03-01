@@ -1,10 +1,9 @@
 <?php
 
-namespace src\Controllers;
 
-class SiteController{
+class HomeController{
     
-    public function contact(){
+    public static function contact(){
 
         return "handling contact";
     }

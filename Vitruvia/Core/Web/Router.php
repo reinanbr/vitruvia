@@ -53,7 +53,7 @@ class Router{
             return $this->renderView("_404");
         }
   /*       if (is_array($call)){
-            return call_user_func($call);
+            return call_user_func($call);///
         } */
         if (is_string($call)){
             return $this->renderView($call);
@@ -62,11 +62,12 @@ class Router{
         return call_user_func($call);
     }
 
+    
 
-    public function renderView($view){
+    public function renderView($view,$params=[]){
 
         $layoutContent = $this->layoutContent();
-        $viewContent = $this->renderOnlyView($view);
+        $viewContent = $this->renderOnlyView($view,$params);
         return str_replace("{{content}}",$viewContent,$layoutContent);
     }
 
