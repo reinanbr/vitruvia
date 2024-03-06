@@ -20,7 +20,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel='stylesheet' href="/static/css/style.css">
-  <title>ReySofts</title>
+  <title>{title}</title>
 </head>
 
 <body>
@@ -29,7 +29,7 @@
     <a class="navbar-brand" href="#">
       <img src="/docs/4.0/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top"
         alt="">
-    Nav
+    {navbar}
     </a>
   </nav>
 

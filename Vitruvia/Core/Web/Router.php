@@ -58,16 +58,21 @@ class Router{
         if (is_string($call)){
             return $this->renderView($call);
         }
-        #$requestMethod = $this->request->getDataRequest();
-        return call_user_func($call);
+        $requestMethod = $this->request->getBody();
+        return call_user_func($call,$requestMethod);
     }
 
     
 
-    public function renderView($view,$params=[]){
+    public function renderView($view,$paramsContent=[],$paramsLayout=[]){
 
         $layoutContent = $this->layoutContent();
-        $viewContent = $this->renderOnlyView($view,$params);
+        $viewContent = $this->renderOnlyViewValues($view,$paramsContent);
+        $keysParamsLayout = array_keys($paramsLayout);
+        $keysParamsLayoutContent = array_map(function($item){
+            return "{".$item."}";
+        },$keysParamsLayout);
+        $layoutContent = str_replace($keysParamsLayoutContent,array_values($paramsLayout),$layoutContent);
         return str_replace("{{content}}",$viewContent,$layoutContent);
     }
 
@@ -77,15 +82,22 @@ class Router{
         return str_replace("{{content}}",$viewContent,$layoutContent);
     }
 
-    protected function layoutContent(){
+    protected function layoutContent(){ 
         ob_start();
         include_once Application::$ROOT_DIR."/views/layouts/base.php";
         return ob_get_clean();
     }
 
-    protected function renderOnlyView($view){
+    protected function renderOnlyViewValues($view,$params){
         ob_start();
         include_once Application::$ROOT_DIR."/views/$view.php";
-        return ob_get_clean();
+        $viewContent = ob_get_clean();
+        $keys = array_keys($params);
+        $keysContent = array_map(function($item){
+           return "{".$item."}";
+        },$keys);
+
+        return str_replace($keysContent,array_values($params),$viewContent);
+
     }
 }

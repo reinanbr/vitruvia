@@ -1,6 +1,7 @@
 <?php
 
 use Vitruvia\Core\Web\Application;
+use Vitruvia\Core\Web\Request;
 use Vitruvia\Utils\Json\Jsonify;
 
 class GetInfoLibsApiController{
@@ -16,8 +17,16 @@ class GetInfoLibsApiController{
         ]);
     }
 
-    public static function contact(){
-        $params = ["name"=>"test"];
-        return Application::$app->router->renderView("contact",$params);
+    public static function contact($request){
+
+
+        $name = $request["name"];
+
+        $paramsContent = ["name"=>"$name"];
+
+        $paramsLayout = ["title"=>"ReySofts - Api de Consumo",
+                        "navbar"=>"Api de Consumos"];
+
+        return Application::$app->router->renderView("contact",$paramsContent,$paramsLayout);
     }
 }
