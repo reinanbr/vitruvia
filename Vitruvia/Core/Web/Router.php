@@ -64,14 +64,15 @@ class Router{
 
     
 
-    public function renderView($view,$paramsContent=[],$paramsLayout=[]){
+    public function renderView($view,$paramsContent=[],$paramsLayout=[],$valuesParams=[]){
 
         $layoutContent = $this->layoutContent();
-        $viewContent = $this->renderOnlyViewValues($view,$paramsContent);
+        $viewContentWithValues = $this->renderOnlyViewValues($view,$valuesParams);
+        $viewContent = $this->renderOnlyViewParams($viewContentWithValues,$paramsContent);
         $keysParamsLayout = array_keys($paramsLayout);
         $keysParamsLayoutContent = array_map(function($item){
             return "{".$item."}";
-        },$keysParamsLayout);
+        },$keysParamsLayout); 
         $layoutContent = str_replace($keysParamsLayoutContent,array_values($paramsLayout),$layoutContent);
         return str_replace("{{content}}",$viewContent,$layoutContent);
     }
@@ -88,16 +89,22 @@ class Router{
         return ob_get_clean();
     }
 
-    protected function renderOnlyViewValues($view,$params){
-        ob_start();
-        include_once Application::$ROOT_DIR."/views/$view.php";
-        $viewContent = ob_get_clean();
+    protected function renderOnlyViewParams($view,$params){
+  
         $keys = array_keys($params);
         $keysContent = array_map(function($item){
            return "{".$item."}";
         },$keys);
 
-        return str_replace($keysContent,array_values($params),$viewContent);
+        return str_replace($keysContent,array_values($params),$view);
+    }
 
+    protected function renderOnlyViewValues($view,$values){
+        foreach($values as $key=>$value){
+            $$key = $value;
+        }
+        ob_start();
+        include_once Application::$ROOT_DIR."/views/$view.php";
+        return ob_get_clean();
     }
 }

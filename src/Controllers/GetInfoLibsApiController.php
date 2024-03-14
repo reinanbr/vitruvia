@@ -22,11 +22,15 @@ class GetInfoLibsApiController{
 
         $name = $request["name"];
 
+
+
         $paramsContent = ["name"=>"$name"];
 
         $paramsLayout = ["title"=>"ReySofts - Api de Consumo",
                         "navbar"=>"Api de Consumos"];
 
-        return Application::$app->router->renderView("contact",$paramsContent,$paramsLayout);
+        $valuesParams = ["say"=>"love-me"];
+
+        return Application::$app->router->renderView("contact",$paramsContent,$paramsLayout,$valuesParams);
     }
 }
