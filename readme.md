@@ -1,8 +1,20 @@
+<div align='center'>
+<h2>Vitruvia</h2>
+<i>Mini Framework MVC Web em PHP</i>
+<hr>
+</div>
+
+### Controllers
+ - *um exemplo de um Controller*
+ 
+```php
 <?php
 
 use Vitruvia\Core\Web\Application;
 use Vitruvia\Core\Web\Request;
 use Vitruvia\Utils\Json\Jsonify;
+
+
 
 class GetInfoLibsApiController{
 
@@ -17,17 +29,19 @@ class GetInfoLibsApiController{
         ]);
     }
 
+
     public static function contact($request){
 
+        $name = $request["name"];
 
-        $name = $request['GET']["name"];
+        $paramsContent = ["name"=>"$name"];
 
-
-        $paramsLayout = ["title"=>"$name",
+        $paramsLayout = ["title"=>"ReySofts - Api de Consumo",
                         "navbar"=>"Api de Consumos"];
 
         $valuesParams = ["say"=>"love-me"];
 
-        return Application::$app->router->renderView("contact",$paramsLayout,$valuesParams);
+        return Application::$app->router->renderView("contact",$paramsContent,$paramsLayout,$valuesParams);
     }
 }
+```

@@ -12,10 +12,9 @@ use Vitruvia\Core\Web\Application;
 $app = new Application(__DIR__);
 
 $app->router->get("/",'home');
-
 $app->router->post('/api/getInfoLibs',[GetInfoLibsApiController::class, "getInfoLibs"]);
-
 $app->router->get("/api/contact",[GetInfoLibsApiController::class, "contact"]);
+
 
 $app->run();
 ?>

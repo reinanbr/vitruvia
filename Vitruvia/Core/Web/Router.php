@@ -58,23 +58,23 @@ class Router{
         if (is_string($call)){
             return $this->renderView($call);
         }
-        $requestMethod = $this->request->getBody();
+        $requestMethod = $this->request->getDataRequest();
         return call_user_func($call,$requestMethod);
     }
 
     
 
-    public function renderView($view,$paramsContent=[],$paramsLayout=[],$valuesParams=[]){
+    public function renderView($view,$paramsLayout=[],$valuesParams=[]){
 
         $layoutContent = $this->layoutContent();
         $viewContentWithValues = $this->renderOnlyViewValues($view,$valuesParams);
-        $viewContent = $this->renderOnlyViewParams($viewContentWithValues,$paramsContent);
+       
         $keysParamsLayout = array_keys($paramsLayout);
         $keysParamsLayoutContent = array_map(function($item){
             return "{".$item."}";
         },$keysParamsLayout); 
         $layoutContent = str_replace($keysParamsLayoutContent,array_values($paramsLayout),$layoutContent);
-        return str_replace("{{content}}",$viewContent,$layoutContent);
+        return str_replace("{{content}}",$viewContentWithValues,$layoutContent);
     }
 
     public function renderContent($viewContent){

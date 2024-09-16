@@ -23,27 +23,27 @@ class RequestHttp
         return $methodHttp;
     }
 
+
     public function getInputHttp()
     {
         $phpInputJson = json_decode(file_get_contents("php://input"));
 
         return $phpInputJson;
     }
+
     public function getDataMethod()
     {
-        $methodHttp = self::getMethod();
-        if ($methodHttp == "GET") {
-            return $_GET;
-        } else if ($methodHttp == "POST") {
-            return $_POST;
-        }
+        return array(
+            "POST"=>$_POST,
+            "GET"=>$_GET
+        );
     }
+
 
     public function getDataRequest()
     {
-        return array(
-            "input"=>self::getInputHttp(),
-            "dataParams"=>self::getDataMethod()
-        );
+        $dataResponse = self::getDataMethod();
+        $dataResponse["input"] = self::getInputHttp();
+        return $dataResponse;
     }
 }
