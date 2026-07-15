@@ -1,110 +1,140 @@
 <?php
 
 namespace Vitruvia\Core\Web;
-use Vitruvia\Core\Controllers\SiteController;
 
-
-class Router{
-    
+/**
+ * Express-style router: routes are matched by method + path (":id"-style
+ * params supported), and each match runs through a middleware chain —
+ * global middleware registered via use(), then the route's own handlers —
+ * where every handler receives (Request $req, Response $res, callable $next).
+ */
+class Router
+{
     public Request $request;
     public Response $response;
     protected array $routes = [];
-    protected string $dirViews = "/";
+    protected array $middleware = [];
 
-    public function __construct(Request $request, Response $response){
+    public function __construct(Request $request, Response $response)
+    {
         $this->request = $request;
         $this->response = $response;
     }
 
-    /**
-     * The function "get" adds a new route to the "routes" array for the HTTP GET method.
-     * 
-     * @param $path The path parameter is a string that represents the URL path for which the callback
-     * function should be executed.
-     * @param $call The "call" parameter is a callback function or method that will be executed when the
-     * specified path is accessed using the HTTP GET method.
-     */
-    public function get($path,$call){
-        $this->routes['GET'][$path] = $call;
+    public function use(callable $middleware): void
+    {
+        $this->middleware[] = $middleware;
     }
 
-    /**
-     * The function `post` adds a new route for handling POST requests in a PHP application.
-     * 
-     * @param $path The `path` parameter in the `post` function represents the URL path for which the
-     * specified callback function will be executed when an HTTP POST request is made to that path.
-     * @param $call The `call` parameter in the `post` function is typically a callback function or a
-     * reference to a method that should be executed when a POST request is made to the specified
-     * ``. This function or method will handle the logic for processing the POST request and
-     * generating the appropriate response.
-     */
-    public function post($path,$call){
-        $this->routes['POST'][$path] = $call;
+    public function get(string $path, callable ...$handlers): void
+    {
+        $this->addRoute('GET', $path, $handlers);
     }
 
+    public function post(string $path, callable ...$handlers): void
+    {
+        $this->addRoute('POST', $path, $handlers);
+    }
 
-    public function resolve(){
-        $path = $this->request->getPath();
-        $method = $this->request->getMethod();
-        $call = $this->routes[$method][$path] ?? false;
+    public function put(string $path, callable ...$handlers): void
+    {
+        $this->addRoute('PUT', $path, $handlers);
+    }
 
-        if ($call == false){
-            $this->response->setStatusCode(404);
-            return $this->renderView("_404");
+    public function patch(string $path, callable ...$handlers): void
+    {
+        $this->addRoute('PATCH', $path, $handlers);
+    }
+
+    public function delete(string $path, callable ...$handlers): void
+    {
+        $this->addRoute('DELETE', $path, $handlers);
+    }
+
+    protected function addRoute(string $method, string $path, array $handlers): void
+    {
+        $keys = [];
+        $pattern = preg_replace_callback('#:([a-zA-Z_][a-zA-Z0-9_]*)#', function ($match) use (&$keys) {
+            $keys[] = $match[1];
+            return '([^/]+)';
+        }, $path);
+
+        $this->routes[$method][] = [
+            'pattern' => '#^' . $pattern . '$#',
+            'keys' => $keys,
+            'handlers' => $handlers,
+        ];
+    }
+
+    public function resolve(): void
+    {
+        foreach ($this->routes[$this->request->method] ?? [] as $route) {
+            if (preg_match($route['pattern'], $this->request->path, $matches)) {
+                array_shift($matches);
+                $this->request->params = array_combine($route['keys'], $matches);
+                $this->dispatch(array_merge($this->middleware, $route['handlers']));
+                return;
+            }
         }
-  /*       if (is_array($call)){
-            return call_user_func($call);///
-        } */
-        if (is_string($call)){
-            return $this->renderView($call);
+
+        $this->response->status(404);
+        $this->response->render('_404');
+    }
+
+    protected function dispatch(array $stack): void
+    {
+        $index = 0;
+        $next = function () use (&$index, &$next, $stack) {
+            if (!isset($stack[$index])) {
+                return;
+            }
+            $handler = $stack[$index++];
+            try {
+                $handler($this->request, $this->response, $next);
+            } catch (\Throwable $e) {
+                $this->handleError($e);
+            }
+        };
+        $next();
+    }
+
+    protected function handleError(\Throwable $e): void
+    {
+        if ($this->response->isSent()) {
+            return;
         }
-        $requestMethod = $this->request->getDataRequest();
-        return call_user_func($call,$requestMethod);
+        $this->response->status(500);
+        $this->response->json([
+            'status' => 500,
+            'message' => $e->getMessage(),
+        ]);
     }
 
-    
-
-    public function renderView($view,$paramsLayout=[],$valuesParams=[]){
-
+    public function renderView(string $view, array $paramsLayout = [], array $valuesParams = []): string
+    {
         $layoutContent = $this->layoutContent();
-        $viewContentWithValues = $this->renderOnlyViewValues($view,$valuesParams);
-       
-        $keysParamsLayout = array_keys($paramsLayout);
-        $keysParamsLayoutContent = array_map(function($item){
-            return "{".$item."}";
-        },$keysParamsLayout); 
-        $layoutContent = str_replace($keysParamsLayoutContent,array_values($paramsLayout),$layoutContent);
-        return str_replace("{{content}}",$viewContentWithValues,$layoutContent);
+        $viewContentWithValues = $this->renderOnlyViewValues($view, $valuesParams);
+
+        $placeholders = array_map(fn ($key) => "{" . $key . "}", array_keys($paramsLayout));
+        $layoutContent = str_replace($placeholders, array_values($paramsLayout), $layoutContent);
+
+        return str_replace("{{content}}", $viewContentWithValues, $layoutContent);
     }
 
-    public function renderContent($viewContent){
-
-        $layoutContent = $this->layoutContent();
-        return str_replace("{{content}}",$viewContent,$layoutContent);
-    }
-
-    protected function layoutContent(){ 
+    protected function layoutContent(): string
+    {
         ob_start();
-        include_once Application::$ROOT_DIR."/views/layouts/base.php";
+        include_once Application::$ROOT_DIR . "/views/layouts/base.php";
         return ob_get_clean();
     }
 
-    protected function renderOnlyViewParams($view,$params){
-  
-        $keys = array_keys($params);
-        $keysContent = array_map(function($item){
-           return "{".$item."}";
-        },$keys);
-
-        return str_replace($keysContent,array_values($params),$view);
-    }
-
-    protected function renderOnlyViewValues($view,$values){
-        foreach($values as $key=>$value){
+    protected function renderOnlyViewValues(string $view, array $values): string
+    {
+        foreach ($values as $key => $value) {
             $$key = $value;
         }
         ob_start();
-        include_once Application::$ROOT_DIR."/views/$view.php";
+        include_once Application::$ROOT_DIR . "/views/$view.php";
         return ob_get_clean();
     }
 }

@@ -1,49 +1,21 @@
 <?php
 
-
 namespace Vitruvia\Core\Web\Config\Http;
 
 class RequestHttp
 {
-
-    public static function getPath()
+    public static function getPath(): string
     {
         $uri = $_SERVER["REQUEST_URI"] ?? "/";
-        $path = $uri;
-        $position = strpos($path, '?');
+        $position = strpos($uri, '?');
         if ($position === false) {
-            return $path;
+            return $uri;
         }
-        return substr($path, 0, $position);
+        return substr($uri, 0, $position);
     }
 
-    public static function getMethod()
+    public static function getMethod(): string
     {
-        $methodHttp = $_SERVER["REQUEST_METHOD"];
-        return $methodHttp;
-    }
-
-
-    public function getInputHttp()
-    {
-        $phpInputJson = json_decode(file_get_contents("php://input"));
-
-        return $phpInputJson;
-    }
-
-    public function getDataMethod()
-    {
-        return array(
-            "POST"=>$_POST,
-            "GET"=>$_GET
-        );
-    }
-
-
-    public function getDataRequest()
-    {
-        $dataResponse = self::getDataMethod();
-        $dataResponse["input"] = self::getInputHttp();
-        return $dataResponse;
+        return $_SERVER["REQUEST_METHOD"] ?? "GET";
     }
 }

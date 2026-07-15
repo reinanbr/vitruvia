@@ -1,16 +1,23 @@
 {
-    "name": "jezuis/vitruvia",
-    "description": "framework api",
-    "autoload": {
-        "psr-4": {
-            "Vitruvia\\": "./Vitruvia/"
-        }
-    },
+    "name": "reinanbr/vitruvia",
+    "description": "Lightweight MVC micro-framework for building small PHP web apps and JSON APIs.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["framework", "mvc", "micro-framework", "router", "php"],
+    "homepage": "https://github.com/reinanbr/vitruvia",
     "authors": [
         {
             "name": "reinanbr",
             "email": "perseu912@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vitruvia\\": "Vitruvia/"
+        }
+    },
+    "minimum-stability": "stable"
 }
